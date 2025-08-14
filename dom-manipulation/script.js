@@ -9,7 +9,7 @@ let quotes = storedQuotes || [
 // DOM references
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
-const categorySelect = document.getElementById("categorySelect");
+const categorySelect = document.getElementById("categoryFilter");
 
 // Populate dropdown with unique categories dynamically
 function populateCategories() {
@@ -32,7 +32,7 @@ function populateCategories() {
 }
 
 // Show a random quote filtered by category
-function showRandomQuote() {
+function filterQuotes() {
   const selectedCategory = categorySelect.value;
   localStorage.setItem("selectedCategory", selectedCategory);
 
@@ -78,7 +78,7 @@ function addQuote() {
   newQuoteCategory.value = "";
 
   populateCategories();
-  showRandomQuote();
+  filterQuotes();
 
   alert("Quote added successfully!");
 }
@@ -141,7 +141,7 @@ function importFromJsonFile(event) {
       alert(`Imported ${newUniqueQuotes.length} new quotes successfully!`);
 
       populateCategories();
-      showRandomQuote();
+      filterQuotes();
     } catch (err) {
       alert("Failed to import JSON: " + err.message);
     }
@@ -161,13 +161,11 @@ function restoreLastViewedQuote() {
 }
 
 // Initialize app
-newQuoteBtn.addEventListener("click", showRandomQuote);
-categorySelect.addEventListener("change", showRandomQuote);
-
-// You must call addQuote with a button listener after the DOM loads
+newQuoteBtn.addEventListener("click", filterQuotes);
+categorySelect.addEventListener("change", filterQuotes);
 document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
 
 // Initial population & display
 populateCategories();
 restoreLastViewedQuote();
-showRandomQuote();
+filterQuotes();
