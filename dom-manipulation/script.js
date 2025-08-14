@@ -1,5 +1,6 @@
-// Initial array of quotes
-let quotes = [
+// Load quotes from localStorage or fallback to default
+let storedQuotes = JSON.parse(localStorage.getItem("quotes"));
+let quotes = storedQuotes || [
   { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "inspiration" },
   { text: "Life is what happens when you're busy making other plans.", category: "life" },
   { text: "You miss 100% of the shots you don't take.", category: "motivation" }
@@ -51,18 +52,30 @@ function addQuote() {
     return;
   }
 
+  // Optional: prevent duplicates
+  if (quotes.some(q => q.text.toLowerCase() === text.toLowerCase())) {
+    alert("This quote already exists.");
+    return;
+  }
+
   quotes.push({ text, category });
+
+  // Save to localStorage
+  localStorage.setItem("quotes", JSON.stringify(quotes));
 
   newQuoteText.value = "";
   newQuoteCategory.value = "";
 
   populateCategories();
+  showRandomQuote();
   alert("Quote added successfully!");
 }
 
 // Event Listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
 addQuoteBtn.addEventListener("click", addQuote);
+categorySelect.addEventListener("change", showRandomQuote); // Optional: auto-refresh on category change
 
 // Initial setup
 populateCategories();
+showRandomQuote();
