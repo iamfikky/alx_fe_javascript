@@ -100,6 +100,74 @@ function addQuote() {
   alert("Quote added successfully!");
 }
 
+// Export quotes to JSON file
+function exportToJson() {
+  if (quotes.length === 0) {
+    alert("No quotes to export.");
+    return;
+  }
+  const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "quotes.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+// Import quotes from JSON file
+function importFromJsonFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+    alert("Please select a valid JSON file.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+    const imported = JSON.parse(e.target.result);
+    if (!Array.isArray(imported)) {
+    alert("Invalid JSON format: expected an array.");
+    return;
+    }
+
+    const validQuotes = imported.filter(q =>
+    q.text && typeof q.text === "string" &&
+    q.category && typeof q.category === "string"
+    );
+
+    if (validQuotes.length === 0) {
+    alert("No valid quotes found in imported file.");
+    return;
+    }
+
+ // Merge new quotes, avoiding duplicates by text
+    const existingTexts = new Set(quotes.map(q => q.text.toLowerCase()));
+    const newUniqueQuotes = validQuotes.filter(q => !existingTexts.has(q.text.toLowerCase()));
+
+    quotes.push(...newUniqueQuotes);
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+    alert(`Imported ${newUniqueQuotes.length} new quotes successfully!`);
+
+    populateCategories();
+    showRandomQuote();
+    } catch (err) {
+      alert("Failed to import JSON: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+
+  // Reset file input to allow re-importing same file
+  event.target.value = "";
+}
+
 // Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
 categorySelect.addEventListener("change", showRandomQuote);
