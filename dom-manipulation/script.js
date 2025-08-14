@@ -1,4 +1,4 @@
-// Load from localStorage or initialize default quotes
+// Load quotes from localStorage or use default quotes
 let storedQuotes = JSON.parse(localStorage.getItem("quotes"));
 let quotes = storedQuotes || [
   { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "inspiration" },
@@ -11,35 +11,7 @@ const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteBtn = document.getElementById("newQuote");
 const categorySelect = document.getElementById("categorySelect");
 
-// Create the Add Quote form dynamically
-function createAddQuoteForm(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  const quoteInput = document.createElement("input");
-  quoteInput.type = "text";
-  quoteInput.id = "newQuoteText";
-  quoteInput.placeholder = "Enter a new quote";
-
-  const categoryInput = document.createElement("input");
-  categoryInput.type = "text";
-  categoryInput.id = "newQuoteCategory";
-  categoryInput.placeholder = "Enter quote category";
-
-  const addButton = document.createElement("button");
-  addButton.id = "addQuoteBtn";
-  addButton.textContent = "Add Quote";
-
-  container.appendChild(quoteInput);
-  container.appendChild(categoryInput);
-  container.appendChild(addButton);
-
-  addButton.addEventListener("click", addQuote);
-}
-
-// Populate dropdown with unique categories
+// Populate dropdown with unique categories dynamically
 function populateCategories() {
   const uniqueCategories = Array.from(new Set(quotes.map(q => q.category)));
   categorySelect.innerHTML = `<option value="all">All</option>`;
@@ -49,11 +21,21 @@ function populateCategories() {
     option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
     categorySelect.appendChild(option);
   });
+
+  // Restore last selected category from localStorage if valid
+  const savedCategory = localStorage.getItem("selectedCategory");
+  if (savedCategory && (savedCategory === "all" || uniqueCategories.includes(savedCategory))) {
+    categorySelect.value = savedCategory;
+  } else {
+    categorySelect.value = "all";
+  }
 }
 
-// Show a random quote (filtered by category)
+// Show a random quote filtered by category
 function showRandomQuote() {
   const selectedCategory = categorySelect.value;
+  localStorage.setItem("selectedCategory", selectedCategory);
+
   const filteredQuotes = selectedCategory === "all"
     ? quotes
     : quotes.filter(q => q.category === selectedCategory);
@@ -67,11 +49,11 @@ function showRandomQuote() {
   const quote = filteredQuotes[randomIndex];
   quoteDisplay.textContent = `"${quote.text}" - (${quote.category})`;
 
-  // Save to sessionStorage
+  // Save last viewed quote in sessionStorage (optional)
   sessionStorage.setItem("lastViewedQuote", JSON.stringify(quote));
 }
 
-// Add a new quote
+// Add a new quote and update storage & UI
 function addQuote() {
   const newQuoteText = document.getElementById("newQuoteText");
   const newQuoteCategory = document.getElementById("newQuoteCategory");
@@ -97,6 +79,7 @@ function addQuote() {
 
   populateCategories();
   showRandomQuote();
+
   alert("Quote added successfully!");
 }
 
@@ -168,7 +151,7 @@ function importFromJsonFile(event) {
   event.target.value = "";
 }
 
-// Restore last viewed quote (sessionStorage)
+// Restore last viewed quote from sessionStorage (optional)
 function restoreLastViewedQuote() {
   const last = sessionStorage.getItem("lastViewedQuote");
   if (last) {
@@ -177,10 +160,14 @@ function restoreLastViewedQuote() {
   }
 }
 
-// Initial setup
+// Initialize app
 newQuoteBtn.addEventListener("click", showRandomQuote);
 categorySelect.addEventListener("change", showRandomQuote);
 
+// You must call addQuote with a button listener after the DOM loads
+document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
+
+// Initial population & display
 populateCategories();
 restoreLastViewedQuote();
-createAddQuoteForm("quoteFormContainer");
+showRandomQuote();
