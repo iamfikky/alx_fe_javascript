@@ -1,37 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dynamic Quote Generator</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dynamic Quote Generator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Dynamic Quote Generator</h1>
+<h1>Dynamic Quote Generator</h1>
 
-  <div>
-    <label for="categorySelect">Choose a category:</label>
-    <select id="categoryFilter" onchange="filterQuotes()">
-      <option value="all">All</option>
-    </select>
-  </div>
+<!-- Display -->
+<div id="quoteDisplay" class="muted">Loading…</div>
 
-  <div id="quoteDisplay" style="margin: 20px 0; font-weight: bold;"></div>
-  <button id="newQuote">Show New Quote</button>
+<!-- Top controls -->
+<div class="controls">
+<button id="newQuote">Show New Quote</button>
 
-  <hr>
+<select id="categoryFilter" aria-label="Filter by category">
+<option value="all">All Categories</option>
+</select>
 
-  <h2>Add a New Quote</h2>
-  <div id="quoteFormContainer">
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button id="addQuoteBtn">Add Quote</button>
+<button id="exportBtn" title="Download quotes as JSON">Export Quotes (JSON)</button>
+<label>
+<span class="muted">Import JSON:</span>
+<input type="file" id="importFile" accept=".json" />
+</label>
 </div>
-    
-  <hr />
-    <h3>Import / Export Quotes</h3>
- <button onclick="exportToJson()">Export Quotes</button>
- <input type="file" accept=".json" onchange="importFromJsonFile(event)" />
 
-  <script src="script.js"></script>
+<!-- Dynamic Add Quote Form will be injected here -->
+<div id="addQuoteContainer" class="space-top"></div>
+
+<!-- Sync status / notifications -->
+<div id="syncStatus" class="muted"></div>
+<div id="notices" class="space-top"></div>
+
+<noscript>This app needs JavaScript to run.</noscript>
+
+<script src="script.js" defer></script>
 </body>
 </html>

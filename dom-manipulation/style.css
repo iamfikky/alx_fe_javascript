@@ -1,0 +1,29 @@
+body { 
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; line-height: 1.45; }
+h1 {
+     margin-bottom: 12px; }
+.controls {
+     display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
+#quoteDisplay {
+     padding: 16px; border: 1px solid #ddd; border-radius: 8px; min-height: 48px; margin: 8px 0 16px; }
+.muted {
+     color: #666; font-size: 0.9rem; }
+.row {
+     display: flex; gap: 8px; flex-wrap: wrap; }
+.row > * {
+     flex: 1 1 220px; }
+button {
+     cursor: pointer; padding: 10px 14px; border-radius: 8px; border: 1px solid #bbb; background: #f7f7f7; }
+button:hover {
+ background: #efefef; }
+ input, select {
+     padding: 10px; border-radius: 8px; border: 1px solid #bbb; }
+#syncStatus {
+    margin: 8px 0; font-size: 0.95rem; }
+.notice {
+     padding: 10px 12px; border-radius: 6px; border: 1px solid #d0e6d8; background: #ecf9f0; }
+
+.warn { border-color: #fde3c8; background: #fff4e9; }
+
+.error { border-color: #f5c4c4; background: #ffecec; }
+.space-top { margin-top: 16px; }
