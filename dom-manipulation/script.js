@@ -115,6 +115,7 @@ function mergeQuotes(serverQuotes) {
 async function syncQuotes() {
   await fetchQuotesFromServer(); // get from server
   // Could add extra logic for pushing unsynced local quotes here
+  alert("Quotes synced with server!");
   console.log("Sync complete");
 }
 
