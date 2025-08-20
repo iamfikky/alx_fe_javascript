@@ -169,28 +169,42 @@ function importFromJsonFile(event) {
 }
 
 // =============================
-// Mock Server API
+// Fetch Quotes from Server (mock API)
 // =============================
 async function fetchQuotesFromServer() {
-  // Simulate API fetch
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve([
-        { text: "Server quote: Knowledge is power.", category: "Wisdom" },
-        { text: "Server quote: Keep pushing forward.", category: "Motivation" }
-      ]);
-    }, 1000);
-  });
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await response.json();
+
+    // Convert posts into { text, category } objects
+    return data.slice(0, 5).map(post => ({
+      text: post.title,
+      category: "Server"
+    }));
+  } catch (err) {
+    console.error("Error fetching quotes from server:", err);
+    return [];
+  }
 }
 
+// =============================
+// Post New Quote to Server (mock API)
+// =============================
 async function postQuoteToServer(quote) {
-  // Simulate API post
-  return new Promise(resolve => {
-    setTimeout(() => {
-      console.log("Posted to server:", quote);
-      resolve({ success: true });
-    }, 500);
-  });
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quote)
+    });
+
+    const result = await response.json();
+    console.log("Posted to server:", result);
+    return result;
+  } catch (err) {
+    console.error("Error posting quote:", err);
+    throw err;
+  }
 }
 
 // =============================
