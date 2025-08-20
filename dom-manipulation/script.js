@@ -115,7 +115,7 @@ async function addQuote() {
 }
 
 // Render form dynamically
-function renderAddQuoteForm() {
+function createAddQuoteForm() {
   const container = document.getElementById("addQuoteContainer");
   container.innerHTML = `
     <h2>Add a New Quote</h2>
@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadQuotes();
   populateCategories();
   restoreLastQuote();
-  renderAddQuoteForm();
+  createAddQuoteForm();
 
   document.getElementById("newQuoteBtnRandom").addEventListener("click", showRandomQuote);
   document.getElementById("exportBtn").addEventListener("click", exportToJsonFile);
