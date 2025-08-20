@@ -90,19 +90,47 @@ function showRandomQuote() {
 }
 
 // =============================
-// Add New Quote
+// Add New Quote + Post to Server
 // =============================
-function addQuote() {
+async function addQuote() {
   const text = document.getElementById("newQuote").value.trim();
   const category = document.getElementById("newCategory").value.trim();
   if (text && category) {
-    quotes.push({ text, category });
+    const newQuote = { text, category };
+    quotes.push(newQuote);
     saveQuotes();
     populateCategories();
     showRandomQuote();
     document.getElementById("newQuote").value = "";
     document.getElementById("newCategory").value = "";
+
+    // Post to server too
+    try {
+      await postQuoteToServer(newQuote);
+      addNotice("Quote also posted to server ✅");
+    } catch (err) {
+      addNotice("Failed to post new quote to server ❌");
+    }
   }
+}
+
+// Render form dynamically
+function renderAddQuoteForm() {
+  const container = document.getElementById("addQuoteContainer");
+  container.innerHTML = `
+    <h2>Add a New Quote</h2>
+    <form id="addQuoteForm">
+      <input type="text" id="newQuote" placeholder="Enter quote" required />
+      <input type="text" id="newCategory" placeholder="Enter category" required />
+      <button type="submit">Add Quote</button>
+    </form>
+  `;
+
+  // handle submit
+  document.getElementById("addQuoteForm").addEventListener("submit", (e) => {
+    e.preventDefault(); // prevent page reload
+    addQuote();
+  });
 }
 
 // =============================
@@ -141,16 +169,101 @@ function importFromJsonFile(event) {
 }
 
 // =============================
+// Mock Server API
+// =============================
+async function fetchQuotesFromServer() {
+  // Simulate API fetch
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve([
+        { text: "Server quote: Knowledge is power.", category: "Wisdom" },
+        { text: "Server quote: Keep pushing forward.", category: "Motivation" }
+      ]);
+    }, 1000);
+  });
+}
+
+async function postQuoteToServer(quote) {
+  // Simulate API post
+  return new Promise(resolve => {
+    setTimeout(() => {
+      console.log("Posted to server:", quote);
+      resolve({ success: true });
+    }, 500);
+  });
+}
+
+// =============================
+// Conflict Resolution
+// =============================
+function resolveConflicts(serverQuotes) {
+  const texts = new Set(quotes.map(q => q.text));
+  let conflicts = [];
+
+  serverQuotes.forEach(sq => {
+    if (!texts.has(sq.text)) {
+      quotes.push(sq);
+    } else {
+      // mark as conflict
+      conflicts.push(sq.text);
+    }
+  });
+
+  if (conflicts.length > 0) {
+    addNotice(`Conflicts detected: ${conflicts.length} duplicate(s) skipped.`);
+  }
+}
+
+// =============================
+// Sync Quotes with Server
+// =============================
+async function syncQuotes() {
+  const status = document.getElementById("syncStatus");
+  status.textContent = "Syncing…";
+
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
+
+    resolveConflicts(serverQuotes); // now handles duplicates
+    saveQuotes();
+    populateCategories();
+
+    status.textContent = "Sync complete ✅";
+    addNotice("Quotes synced with server!");
+  } catch (err) {
+    status.textContent = "Sync failed ❌";
+    addNotice("Error syncing with server.");
+  }
+}
+
+// =============================
+// UI Notices
+// =============================
+function addNotice(msg) {
+  const div = document.createElement("div");
+  div.textContent = msg;
+  div.style.padding = "5px";
+  div.style.marginTop = "5px";
+  div.style.borderRadius = "4px";
+  div.style.backgroundColor = msg.includes("❌") ? "#fdd" : "#dfd";
+  document.getElementById("notices").appendChild(div);
+}
+
+// =============================
 // Event Listeners
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
   loadQuotes();
   populateCategories();
   restoreLastQuote();
+  renderAddQuoteForm();
 
-  document.getElementById("newQuoteBtn").addEventListener("click", addQuote);
   document.getElementById("newQuoteBtnRandom").addEventListener("click", showRandomQuote);
   document.getElementById("exportBtn").addEventListener("click", exportToJsonFile);
   document.getElementById("importFile").addEventListener("change", importFromJsonFile);
   document.getElementById("categoryFilter").addEventListener("change", showRandomQuote);
+  document.getElementById("syncNowBtn").addEventListener("click", syncQuotes);
+
+  // auto-sync every 30s
+  setInterval(syncQuotes, 30000);
 });
